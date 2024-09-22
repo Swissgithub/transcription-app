@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import os
 import whisper
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import pipeline
 import soundfile as sf
 from pydub import AudioSegment
 
@@ -11,9 +11,8 @@ app = Flask(__name__)
 # Charger les modèles
 whisper_model = whisper.load_model("base")
 
-# Initialiser LLaMA
-llama_tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-llama_model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
+# Initialiser le modèle de résumé BART
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 UPLOAD_FOLDER = 'uploads'
 TRANSCRIPTION_FOLDER = 'transcriptions'
@@ -85,13 +84,7 @@ def transcribe():
     return jsonify({"transcription": transcription, "summary": summary, "filename": transcription_filename})
 
 def summarize(text):
-    prompt = f"Résume le texte suivant en français en quelques phrases clés : {text}"
-    inputs = llama_tokenizer(prompt, return_tensors="pt")
-    
-    with torch.no_grad():
-        outputs = llama_model.generate(**inputs, max_length=150, num_return_sequences=1)
-    
-    summary = llama_tokenizer.decode(outputs[0], skip_special_tokens=True)
+    summary = summarizer(text, max_length=130, min_length=30, do_sample=False)[0]['summary_text']
     return summary
 
 if __name__ == '__main__':

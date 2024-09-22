@@ -5,3 +5,4 @@ transformers==4.15.0
 soundfile==0.10.3.post1
 pydub==0.25.1
 sentencepiece==0.1.96
+datasets==2.10.0
