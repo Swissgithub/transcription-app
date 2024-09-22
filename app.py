@@ -9,7 +9,7 @@ from pydub import AudioSegment
 app = Flask(__name__)
 
 # Charger les modèles
-whisper_model = whisper.load_model("base")
+whisper_model = whisper.load_model("small")
 
 # Initialiser le modèle de résumé BART
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
