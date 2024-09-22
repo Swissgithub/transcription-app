@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Transcription</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Application de Transcription</h1>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="upload-section">
+            <h2>Télécharger un fichier audio ou vidéo</h2>
+            <input type="file" id="fileInput" accept="audio/*,video/*">
+            <button onclick="uploadFile()">Télécharger</button>
+        </div>
+
+        <div class="record-section">
+            <h2>Enregistrer à partir du microphone</h2>
+            <button id="recordButton">Commencer l'enregistrement</button>
+        </div>
+
+        <div id="result" class="result-section">
+            <h2>Résultat de la transcription</h2>
+            <div id="transcription"></div>
+            <h3>Résumé et informations</h3>
+            <div id="summary"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
