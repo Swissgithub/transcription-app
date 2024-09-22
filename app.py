@@ -9,7 +9,7 @@ from pydub import AudioSegment
 app = Flask(__name__)
 
 # Charger les modèles
-whisper_model = whisper.load_model("small")
+whisper_model = whisper.load_model("medium")  # Utilisation du modèle "medium" pour une meilleure qualité
 
 # Initialiser le modèle de résumé BART
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
@@ -61,17 +61,17 @@ def transcribe():
         file_path = os.path.join(UPLOAD_FOLDER, f"{os.path.splitext(filename)[0]}.wav")
         audio.export(file_path, format="wav")
     
-    # Charger l'audio
-    audio = whisper.load_audio(file_path)
-    audio = whisper.pad_or_trim(audio)
+    print(f"Transcribing file: {file_path}")  # Log pour le débogage
     
-    # Faire la transcription
-    mel = whisper.log_mel_spectrogram(audio).to(whisper_model.device)
-    _, probs = whisper_model.detect_language(mel)
-    options = whisper.DecodingOptions(fp16 = False)
-    result = whisper.decode(whisper_model, mel, options)
+    # Charger et transcrire l'audio
+    try:
+        result = whisper_model.transcribe(file_path, fp16=False)
+        transcription = result["text"]
+    except Exception as e:
+        print(f"Error during transcription: {str(e)}")  # Log pour le débogage
+        return jsonify({"error": "Transcription failed"}), 500
     
-    transcription = result.text
+    print(f"Transcription completed. Length: {len(transcription)} characters")  # Log pour le débogage
     
     # Sauvegarder la transcription
     transcription_filename = os.path.join(TRANSCRIPTION_FOLDER, f"{os.path.splitext(filename)[0]}_transcription.txt")

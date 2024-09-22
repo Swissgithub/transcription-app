@@ -69,37 +69,28 @@ Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d
 
 ## Fonctionnement
 
-1. L'audio est d'abord transcrit en utilisant le modèle Whisper.
+1. L'audio est transcrit en utilisant le modèle Whisper "medium" pour une meilleure qualité.
 2. La transcription est ensuite envoyée au modèle BART pour générer un résumé.
 3. Le résumé est généré avec une longueur adaptative, variant entre 30% et 50% de la longueur du texte original, avec un minimum de 30 mots et un maximum de 130 mots.
 4. Les résultats (transcription et résumé) sont affichés sur la page web et sauvegardés localement.
 
+## Remarques importantes
+
+- Le traitement peut prendre un certain temps, en particulier pour les fichiers audio longs, en raison de l'utilisation du modèle Whisper "medium".
+- L'utilisation du modèle Whisper "medium" et de BART pour le résumé nécessite une quantité significative de mémoire et de puissance de calcul. Les performances peuvent varier en fonction de la configuration de votre Raspberry Pi 5.
+- La transcription est maintenant capable de gérer des fichiers audio de toutes longueurs, résolvant le problème précédent de transcriptions incomplètes.
+- Assurez-vous d'avoir suffisamment d'espace disque libre pour stocker les fichiers audio, les transcriptions et les modèles de langage.
+
 ## Dépannage
 
-Si vous rencontrez des problèmes, en particulier avec le bouton "Commencer l'enregistrement", suivez ces étapes :
+Si vous rencontrez des problèmes :
 
-1. Assurez-vous d'utiliser un navigateur web moderne et à jour (Chrome, Firefox, ou Safari récent).
+1. Vérifiez les logs de l'application dans la console où vous avez lancé `python app.py` pour des informations de débogage sur le processus de transcription.
 
-2. Vérifiez que le microphone est correctement connecté et reconnu par le système :
-   - Utilisez la commande `arecord -l` pour lister les périphériques audio disponibles.
+2. Assurez-vous que votre Raspberry Pi 5 dispose de suffisamment de ressources (mémoire et CPU) pour exécuter les modèles de transcription et de résumé.
 
-3. Ouvrez la console de développeur de votre navigateur (généralement F12 ou Ctrl+Shift+I) :
-   - Vérifiez s'il y a des erreurs JavaScript affichées en rouge.
-   - Recherchez les messages de log ajoutés pour le débogage, comme "Script chargé" ou "DOM entièrement chargé et analysé".
+3. Pour les problèmes liés au bouton "Commencer l'enregistrement", consultez la console de développeur de votre navigateur (F12 ou Ctrl+Shift+I) pour voir les messages de log et les erreurs potentielles.
 
-4. Si vous voyez une erreur indiquant que MediaRecorder n'est pas supporté, votre navigateur peut ne pas prendre en charge cette fonctionnalité. Essayez avec un navigateur différent.
-
-5. Assurez-vous que vous avez accordé les permissions d'accès au microphone à votre navigateur lorsque demandé.
-
-6. Si le problème persiste, essayez de redémarrer le serveur Flask et de recharger la page web.
-
-7. En cas d'erreurs lors de l'exécution de l'application, vérifiez les logs dans la console où vous avez lancé `python app.py`.
-
-## Remarques
-
-- Le traitement peut prendre un certain temps en fonction de la longueur de l'audio et des performances de votre Raspberry Pi 5.
-- L'utilisation de BART pour le résumé nécessite une quantité significative de mémoire et de puissance de calcul. Les performances peuvent varier en fonction de la configuration de votre Raspberry Pi 5.
-- La longueur du résumé est automatiquement ajustée en fonction de la longueur de la transcription, ce qui permet d'obtenir des résumés plus pertinents et concis.
-- Assurez-vous d'avoir suffisamment d'espace disque libre pour stocker les fichiers audio, les transcriptions et les modèles de langage.
+4. Si la transcription échoue pour des fichiers spécifiques, assurez-vous qu'ils sont dans un format audio supporté (WAV, MP3, etc.).
 
 Pour toute question ou problème persistant, n'hésitez pas à ouvrir une issue sur le dépôt GitHub du projet.
