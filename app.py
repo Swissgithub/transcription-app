@@ -84,7 +84,14 @@ def transcribe():
     return jsonify({"transcription": transcription, "summary": summary, "filename": transcription_filename})
 
 def summarize(text):
-    summary = summarizer(text, max_length=130, min_length=30, do_sample=False)[0]['summary_text']
+    # Calculer la longueur du texte en mots
+    word_count = len(text.split())
+    
+    # Calculer la longueur maximale du résumé (30% à 50% du texte original)
+    max_length = max(30, min(int(word_count * 0.5), 130))
+    min_length = max(30, min(int(word_count * 0.3), 100))
+    
+    summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
     return summary
 
 if __name__ == '__main__':

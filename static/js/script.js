@@ -1,5 +1,13 @@
+console.log("Script chargé");
+
 let mediaRecorder;
 let audioChunks = [];
+
+// Vérifier si le navigateur supporte MediaRecorder
+if (!window.MediaRecorder) {
+    console.error("MediaRecorder n'est pas supporté par ce navigateur");
+    alert("Votre navigateur ne supporte pas l'enregistrement audio. Veuillez utiliser un navigateur moderne comme Chrome ou Firefox.");
+}
 
 function uploadFile() {
     const fileInput = document.getElementById('fileInput');
@@ -28,9 +36,19 @@ function uploadFile() {
     });
 }
 
-document.getElementById('recordButton').addEventListener('click', toggleRecording);
+document.addEventListener('DOMContentLoaded', (event) => {
+    console.log("DOM entièrement chargé et analysé");
+    const recordButton = document.getElementById('recordButton');
+    if (recordButton) {
+        recordButton.addEventListener('click', toggleRecording);
+        console.log("Event listener ajouté au bouton d'enregistrement");
+    } else {
+        console.error("Bouton d'enregistrement non trouvé");
+    }
+});
 
 function toggleRecording() {
+    console.log("Fonction toggleRecording appelée");
     if (mediaRecorder && mediaRecorder.state === "recording") {
         stopRecording();
     } else {
@@ -39,6 +57,7 @@ function toggleRecording() {
 }
 
 function startRecording() {
+    console.log("Démarrage de l'enregistrement");
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
@@ -57,6 +76,7 @@ function startRecording() {
 }
 
 function stopRecording() {
+    console.log("Arrêt de l'enregistrement");
     if (mediaRecorder) {
         mediaRecorder.stop();
         updateStatus('Traitement de l\'enregistrement...');
@@ -65,6 +85,7 @@ function stopRecording() {
 }
 
 function sendAudioData() {
+    console.log("Envoi des données audio");
     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.wav');
