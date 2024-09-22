@@ -5,4 +5,4 @@ transformers
 soundfile
 pydub
 sentencepiece
-datasetsS
+datasets
