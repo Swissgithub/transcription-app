@@ -1,6 +1,6 @@
 # Application de Transcription et Résumé pour Raspberry Pi 5
 
-Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d'enregistrer et de transcrire l'audio à partir du microphone. Elle utilise Whisper pour la transcription et le modèle BART pour générer un résumé de la transcription.
+Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d'enregistrer et de transcrire l'audio à partir du microphone. Elle utilise Whisper pour la transcription et le modèle LLaMA pour générer un résumé de la transcription.
 
 ## Prérequis
 
@@ -28,17 +28,13 @@ Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d
    ./install.sh
    ```
 
-   Ce script installera toutes les dépendances nécessaires, configurera l'environnement et téléchargera les modèles Whisper et BART.
+   Ce script installera toutes les dépendances nécessaires et configurera l'environnement.
 
 ## Configuration
 
 1. Assurez-vous que votre microphone USB est correctement connecté et reconnu par le système.
 
-2. Si nécessaire, ajustez les paramètres du microphone dans le fichier `app.py` :
-   ```python
-   # Dans la fonction record_audio()
-   device_index = 0  # Modifiez cette valeur si nécessaire
-   ```
+2. Si nécessaire, ajustez les paramètres du microphone dans le fichier `app.py`.
 
 ## Exécution de l'application
 
@@ -69,28 +65,31 @@ Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d
 
 ## Fonctionnement
 
-1. L'audio est transcrit en utilisant le modèle Whisper "medium" pour une meilleure qualité.
-2. La transcription est ensuite envoyée au modèle BART pour générer un résumé.
-3. Le résumé est généré avec une longueur adaptative, variant entre 30% et 50% de la longueur du texte original, avec un minimum de 30 mots et un maximum de 130 mots.
-4. Les résultats (transcription et résumé) sont affichés sur la page web et sauvegardés localement.
+1. L'audio est transcrit en utilisant le modèle Whisper "medium".
+2. Une fois la transcription terminée, le modèle Whisper est déchargé de la mémoire.
+3. La transcription est ensuite envoyée au modèle LLaMA pour générer un résumé.
+4. LLaMA génère un résumé dans la même langue que la transcription.
+5. Après la génération du résumé, le modèle LLaMA est déchargé de la mémoire.
+6. Les résultats (transcription et résumé) sont affichés sur la page web et sauvegardés localement.
 
 ## Remarques importantes
 
-- Le traitement peut prendre un certain temps, en particulier pour les fichiers audio longs, en raison de l'utilisation du modèle Whisper "medium".
-- L'utilisation du modèle Whisper "medium" et de BART pour le résumé nécessite une quantité significative de mémoire et de puissance de calcul. Les performances peuvent varier en fonction de la configuration de votre Raspberry Pi 5.
-- La transcription est maintenant capable de gérer des fichiers audio de toutes longueurs, résolvant le problème précédent de transcriptions incomplètes.
-- Assurez-vous d'avoir suffisamment d'espace disque libre pour stocker les fichiers audio, les transcriptions et les modèles de langage.
+- Les modèles sont chargés et déchargés séquentiellement pour optimiser l'utilisation de la mémoire.
+- Le traitement peut prendre un certain temps, en particulier pour les fichiers audio longs.
+- L'utilisation de Whisper "medium" et de LLaMA nécessite une quantité significative de mémoire et de puissance de calcul. Les performances peuvent varier en fonction de la configuration de votre Raspberry Pi 5.
+- La transcription est capable de gérer des fichiers audio de toutes longueurs.
+- Le résumé est généré dans la même langue que la transcription originale.
 
 ## Dépannage
 
 Si vous rencontrez des problèmes :
 
-1. Vérifiez les logs de l'application dans la console où vous avez lancé `python app.py` pour des informations de débogage sur le processus de transcription.
+1. Vérifiez les logs de l'application dans la console où vous avez lancé `python app.py` pour des informations de débogage sur le processus de transcription et de résumé.
 
 2. Assurez-vous que votre Raspberry Pi 5 dispose de suffisamment de ressources (mémoire et CPU) pour exécuter les modèles de transcription et de résumé.
 
 3. Pour les problèmes liés au bouton "Commencer l'enregistrement", consultez la console de développeur de votre navigateur (F12 ou Ctrl+Shift+I) pour voir les messages de log et les erreurs potentielles.
 
-4. Si la transcription échoue pour des fichiers spécifiques, assurez-vous qu'ils sont dans un format audio supporté (WAV, MP3, etc.).
+4. Si la transcription ou le résumé échouent pour des fichiers spécifiques, assurez-vous qu'ils sont dans un format audio supporté (WAV, MP3, etc.).
 
 Pour toute question ou problème persistant, n'hésitez pas à ouvrir une issue sur le dépôt GitHub du projet.

@@ -2,17 +2,9 @@ from flask import Flask, render_template, request, jsonify
 import os
 import whisper
 import torch
-from transformers import pipeline
-import soundfile as sf
-from pydub import AudioSegment
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 app = Flask(__name__)
-
-# Charger les modèles
-whisper_model = whisper.load_model("medium")  # Utilisation du modèle "medium" pour une meilleure qualité
-
-# Initialiser le modèle de résumé BART
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 UPLOAD_FOLDER = 'uploads'
 TRANSCRIPTION_FOLDER = 'transcriptions'
@@ -55,43 +47,60 @@ def transcribe():
     
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     
-    # Convertir en format WAV si nécessaire
-    if not filename.lower().endswith('.wav'):
-        audio = AudioSegment.from_file(file_path)
-        file_path = os.path.join(UPLOAD_FOLDER, f"{os.path.splitext(filename)[0]}.wav")
-        audio.export(file_path, format="wav")
-    
     print(f"Transcribing file: {file_path}")  # Log pour le débogage
     
-    # Charger et transcrire l'audio
+    # Charger le modèle Whisper
+    whisper_model = whisper.load_model("medium")
+    
     try:
+        # Transcrire l'audio
         result = whisper_model.transcribe(file_path, fp16=False)
         transcription = result["text"]
+        
+        print(f"Transcription completed. Length: {len(transcription)} characters")  # Log pour le débogage
+        
+        # Sauvegarder la transcription
+        transcription_filename = os.path.join(TRANSCRIPTION_FOLDER, f"{os.path.splitext(filename)[0]}_transcription.txt")
+        with open(transcription_filename, 'w') as f:
+            f.write(transcription)
+        
+        # Libérer la mémoire du modèle Whisper
+        del whisper_model
+        torch.cuda.empty_cache()
+        
+        # Générer le résumé
+        summary = summarize(transcription)
+        
+        return jsonify({"transcription": transcription, "summary": summary, "filename": transcription_filename})
+    
     except Exception as e:
         print(f"Error during transcription: {str(e)}")  # Log pour le débogage
         return jsonify({"error": "Transcription failed"}), 500
-    
-    print(f"Transcription completed. Length: {len(transcription)} characters")  # Log pour le débogage
-    
-    # Sauvegarder la transcription
-    transcription_filename = os.path.join(TRANSCRIPTION_FOLDER, f"{os.path.splitext(filename)[0]}_transcription.txt")
-    with open(transcription_filename, 'w') as f:
-        f.write(transcription)
-    
-    # Générer le résumé
-    summary = summarize(transcription)
-    
-    return jsonify({"transcription": transcription, "summary": summary, "filename": transcription_filename})
 
 def summarize(text):
-    # Calculer la longueur du texte en mots
-    word_count = len(text.split())
+    print("Starting summarization")  # Log pour le débogage
     
-    # Calculer la longueur maximale du résumé (30% à 50% du texte original)
-    max_length = max(30, min(int(word_count * 0.5), 130))
-    min_length = max(30, min(int(word_count * 0.3), 100))
+    # Charger le modèle LLaMA
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
+    model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
     
-    summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+    prompt = f"summarize me the following transcription. The summarization must be in the same language as the transcription: {text}"
+    
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
+    # Générer le résumé
+    with torch.no_grad():
+        output = model.generate(**inputs, max_length=150, num_return_sequences=1)
+    
+    summary = tokenizer.decode(output[0], skip_special_tokens=True)
+    
+    # Libérer la mémoire du modèle LLaMA
+    del model
+    del tokenizer
+    torch.cuda.empty_cache()
+    
+    print("Summarization completed")  # Log pour le débogage
+    
     return summary
 
 if __name__ == '__main__':

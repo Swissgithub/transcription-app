@@ -18,7 +18,7 @@ pip install -r requirements.txt
 pip install git+https://github.com/openai/whisper.git 
 sudo apt install -y ffmpeg
 
-# Télécharger le modèle BART
-python -c "from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; AutoTokenizer.from_pretrained('facebook/bart-large-cnn'); AutoModelForSeq2SeqLM.from_pretrained('facebook/bart-large-cnn')"
+# Télécharger le modèle LLaMA
+python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; AutoTokenizer.from_pretrained('meta-llama/Llama-2-7b-chat-hf'); AutoModelForCausalLM.from_pretrained('meta-llama/Llama-2-7b-chat-hf')"
 
-echo "Installation terminée. Activez l'environnement virtuel avec 'source venv/bin/activate' avant de lancer l'application. Les modèles Whisper et BART ont été téléchargés."
+echo "Installation terminée. Activez l'environnement virtuel avec 'source venv/bin/activate' avant de lancer l'application. Les modèles Whisper et LLaMA ont été téléchargés."

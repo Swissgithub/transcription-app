@@ -1,8 +1,7 @@
-Flask
-openai-whisper
-torch
-transformers
-soundfile
-pydub
-sentencepiece
-datasets
+Flask==2.1.0
+openai-whisper==20230314
+torch==1.10.0
+transformers==4.28.1
+soundfile==0.10.3.post1
+pydub==0.25.1
+sentencepiece==0.1.96
