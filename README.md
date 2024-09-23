@@ -32,29 +32,25 @@ Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d
 
 ### Note importante sur l'installation
 
-Si vous rencontrez des problèmes lors de l'installation, en particulier avec la bibliothèque tiktoken, le script d'installation tentera de la compiler à partir des sources. Cela peut prendre un certain temps, soyez patient.
-
-En cas d'échec de l'installation, vous pouvez essayer les étapes suivantes manuellement :
+Si vous rencontrez des problèmes lors de l'installation, en particulier avec la bibliothèque tiktoken, suivez ces étapes :
 
 1. Activez l'environnement virtuel :
    ```
    source venv/bin/activate
    ```
 
-2. Mettez à jour pip et les outils de build :
+2. Désinstallez tiktoken et réinstallez-le à partir des sources :
    ```
-   pip install --upgrade pip setuptools wheel
-   ```
-
-3. Installez tiktoken à partir des sources :
-   ```
-   pip install --no-binary :all: tiktoken
+   pip uninstall -y tiktoken
+   pip install --no-binary :all: tiktoken==0.1.2
    ```
 
-4. Réinstallez les autres dépendances :
+3. Vérifiez l'installation de tiktoken :
    ```
-   pip install -r requirements.txt
+   python -c "import tiktoken; print('Tiktoken installé avec succès')"
    ```
+
+Si le problème persiste, vous pouvez essayer de modifier le code de l'application pour éviter l'utilisation de tiktoken. Consultez la section "Dépannage avancé" ci-dessous.
 
 ## Configuration
 
@@ -118,6 +114,32 @@ Si vous rencontrez des problèmes :
 
 4. Si la transcription ou le résumé échouent pour des fichiers spécifiques, assurez-vous qu'ils sont dans un format audio supporté (WAV, MP3, etc.).
 
-5. En cas de problèmes persistants avec tiktoken ou d'autres dépendances, essayez de les réinstaller manuellement comme décrit dans la section "Note importante sur l'installation".
+### Dépannage avancé
+
+Si vous continuez à rencontrer des problèmes avec tiktoken, vous pouvez essayer de modifier le code de l'application pour éviter son utilisation. Voici les étapes à suivre :
+
+1. Ouvrez le fichier `venv/lib/python3.11/site-packages/whisper/tokenizer.py`
+
+2. Commentez ou supprimez la ligne qui importe tiktoken :
+   ```python
+   # import tiktoken
+   ```
+
+3. Remplacez la fonction `get_tokenizer()` par une version simplifiée qui n'utilise pas tiktoken. Par exemple :
+   ```python
+   def get_tokenizer(multilingual: bool):
+       return BasicTokenizer()
+
+   class BasicTokenizer:
+       def encode(self, text):
+           return text.split()
+
+       def decode(self, tokens):
+           return ' '.join(tokens)
+   ```
+
+4. Sauvegardez le fichier et relancez l'application.
+
+Cette modification peut affecter la qualité de la tokenization, mais elle devrait permettre à l'application de fonctionner sans tiktoken.
 
 Pour toute question ou problème persistant, n'hésitez pas à ouvrir une issue sur le dépôt GitHub du projet.
