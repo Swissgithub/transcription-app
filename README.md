@@ -28,7 +28,33 @@ Cette application permet de transcrire des fichiers audio ou vidéo, ainsi que d
    ./install.sh
    ```
 
-   Ce script installera toutes les dépendances nécessaires et configurera l'environnement.
+   Ce script installera toutes les dépendances nécessaires, configurera l'environnement et téléchargera les modèles Whisper et LLaMA.
+
+### Note importante sur l'installation
+
+Si vous rencontrez des problèmes lors de l'installation, en particulier avec la bibliothèque tiktoken, le script d'installation tentera de la compiler à partir des sources. Cela peut prendre un certain temps, soyez patient.
+
+En cas d'échec de l'installation, vous pouvez essayer les étapes suivantes manuellement :
+
+1. Activez l'environnement virtuel :
+   ```
+   source venv/bin/activate
+   ```
+
+2. Mettez à jour pip et les outils de build :
+   ```
+   pip install --upgrade pip setuptools wheel
+   ```
+
+3. Installez tiktoken à partir des sources :
+   ```
+   pip install --no-binary :all: tiktoken
+   ```
+
+4. Réinstallez les autres dépendances :
+   ```
+   pip install -r requirements.txt
+   ```
 
 ## Configuration
 
@@ -91,5 +117,7 @@ Si vous rencontrez des problèmes :
 3. Pour les problèmes liés au bouton "Commencer l'enregistrement", consultez la console de développeur de votre navigateur (F12 ou Ctrl+Shift+I) pour voir les messages de log et les erreurs potentielles.
 
 4. Si la transcription ou le résumé échouent pour des fichiers spécifiques, assurez-vous qu'ils sont dans un format audio supporté (WAV, MP3, etc.).
+
+5. En cas de problèmes persistants avec tiktoken ou d'autres dépendances, essayez de les réinstaller manuellement comme décrit dans la section "Note importante sur l'installation".
 
 Pour toute question ou problème persistant, n'hésitez pas à ouvrir une issue sur le dépôt GitHub du projet.

@@ -5,3 +5,4 @@ transformers==4.28.1
 soundfile==0.10.3.post1
 pydub==0.25.1
 sentencepiece==0.1.96
+tiktoken==0.3.3
